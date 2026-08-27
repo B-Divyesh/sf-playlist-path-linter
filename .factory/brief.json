@@ -1,0 +1,8 @@
+{
+  "slug": "playlist-path-linter",
+  "title": "Playlist Path Linter",
+  "artifact_class": "cli",
+  "smallest_useful_product": "CLI that reads M3U/M3U8 plus a library root, resolves NFC/NFD variants, reports missing/ambiguous paths and invalid year/date tags, and emits an optional corrected copy plus JSON report.",
+  "constraints": "Read-only by default; preserve encoding; never contact music services; test paths on case-sensitive and case-insensitive filesystems.",
+  "monetization": "free"
+}
