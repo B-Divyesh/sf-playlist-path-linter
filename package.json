@@ -1,0 +1,25 @@
+{
+  "name": "playlist-path-linter",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite --config site/vite.config.ts",
+    "test:cli": "cargo test --workspace",
+    "test:site": "node --test site/src/lint.test.mjs",
+    "test": "npm run test:cli && npm run test:site",
+    "audit:browser": "node scripts/browser-audit.mjs",
+    "build:cli": "cargo build --workspace --release",
+    "build:site": "vite build --config site/vite.config.ts",
+    "build": "npm run build:cli && npm run build:site"
+  },
+  "devDependencies": {
+    "@axe-core/playwright": "^4.13.0",
+    "playwright": "^1.62.1",
+    "typescript": "^5.9.2",
+    "vite": "^7.1.3"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}
