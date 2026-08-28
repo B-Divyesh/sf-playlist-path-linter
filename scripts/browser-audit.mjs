@@ -1,4 +1,4 @@
-import { writeFile } from "node:fs/promises";
+import { mkdir, writeFile } from "node:fs/promises";
 import { chromium } from "playwright";
 import AxeBuilder from "@axe-core/playwright";
 
@@ -25,6 +25,7 @@ const report = {
   noHorizontalOverflow,
   violations: axe.violations.map(({ id, impact, help, nodes }) => ({ id, impact, help, nodes: nodes.length }))
 };
+await mkdir(".factory/evidence", { recursive: true });
 await writeFile(".factory/evidence/browser-audit.json", JSON.stringify(report, null, 2));
 console.log(JSON.stringify(report, null, 2));
 await browser.close();

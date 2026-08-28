@@ -1,6 +1,35 @@
 use playlist_path_linter::{lint_playlist, CaseMode, LintOptions};
 use std::fs;
+use std::process::Command;
 use tempfile::tempdir;
+
+fn riff_with_icrd(value: &str) -> Vec<u8> {
+    let value_size = value.len() + 1;
+    let padding = value_size % 2;
+    let mut bytes = b"RIFF".to_vec();
+    bytes.extend_from_slice(&64_u32.to_le_bytes());
+    bytes.extend_from_slice(b"WAVEfmt ");
+    bytes.extend_from_slice(&16_u32.to_le_bytes());
+    bytes.extend_from_slice(&1_u16.to_le_bytes());
+    bytes.extend_from_slice(&1_u16.to_le_bytes());
+    bytes.extend_from_slice(&8000_u32.to_le_bytes());
+    bytes.extend_from_slice(&16000_u32.to_le_bytes());
+    bytes.extend_from_slice(&2_u16.to_le_bytes());
+    bytes.extend_from_slice(&16_u16.to_le_bytes());
+    bytes.extend_from_slice(b"data");
+    bytes.extend_from_slice(&2_u32.to_le_bytes());
+    bytes.extend_from_slice(&[0, 0]);
+    bytes.extend_from_slice(b"LIST");
+    bytes.extend_from_slice(&((12 + value_size + padding) as u32).to_le_bytes());
+    bytes.extend_from_slice(b"INFOICRD");
+    bytes.extend_from_slice(&(value_size as u32).to_le_bytes());
+    bytes.extend_from_slice(value.as_bytes());
+    bytes.push(0);
+    if padding != 0 {
+        bytes.push(0);
+    }
+    bytes
+}
 
 #[test]
 fn diagnoses_unicode_missing_and_writes_a_corrected_copy() {
@@ -113,25 +142,7 @@ fn catches_year_zero_in_a_riff_date_tag() {
     let library = temp.path().join("music");
     fs::create_dir(&library).unwrap();
     let track = library.join("dated.wav");
-    let mut bytes = b"RIFF".to_vec();
-    bytes.extend_from_slice(&64_u32.to_le_bytes());
-    bytes.extend_from_slice(b"WAVEfmt ");
-    bytes.extend_from_slice(&16_u32.to_le_bytes());
-    bytes.extend_from_slice(&1_u16.to_le_bytes());
-    bytes.extend_from_slice(&1_u16.to_le_bytes());
-    bytes.extend_from_slice(&8000_u32.to_le_bytes());
-    bytes.extend_from_slice(&16000_u32.to_le_bytes());
-    bytes.extend_from_slice(&2_u16.to_le_bytes());
-    bytes.extend_from_slice(&16_u16.to_le_bytes());
-    bytes.extend_from_slice(b"data");
-    bytes.extend_from_slice(&2_u32.to_le_bytes());
-    bytes.extend_from_slice(&[0, 0]);
-    bytes.extend_from_slice(b"LIST");
-    bytes.extend_from_slice(&18_u32.to_le_bytes());
-    bytes.extend_from_slice(b"INFOICRD");
-    bytes.extend_from_slice(&5_u32.to_le_bytes());
-    bytes.extend_from_slice(b"0000\0\0");
-    fs::write(&track, bytes).unwrap();
+    fs::write(&track, riff_with_icrd("0000")).unwrap();
     let playlist = temp.path().join("dated.m3u8");
     fs::write(&playlist, "dated.wav\n").unwrap();
 
@@ -148,4 +159,43 @@ fn catches_year_zero_in_a_riff_date_tag() {
         .iter()
         .any(|item| item.code == "invalid_date_tag"));
     assert_eq!(report.summary.date_issues, 1);
+}
+
+#[test]
+fn cli_reports_malformed_riff_timestamp_in_json() {
+    let temp = tempdir().unwrap();
+    let library = temp.path().join("library");
+    fs::create_dir(&library).unwrap();
+    fs::write(
+        library.join("dated.wav"),
+        riff_with_icrd("2024-01-01Tbogus"),
+    )
+    .unwrap();
+    let playlist = temp.path().join("dated.m3u8");
+    fs::write(&playlist, "dated.wav\n").unwrap();
+
+    let output = Command::new(env!("CARGO_BIN_EXE_playlist-path-linter"))
+        .args([
+            "lint",
+            playlist.to_str().unwrap(),
+            "--root",
+            library.to_str().unwrap(),
+            "--case",
+            "sensitive",
+            "--json",
+        ])
+        .output()
+        .unwrap();
+
+    assert_eq!(output.status.code(), Some(1));
+    let report: serde_json::Value = serde_json::from_slice(&output.stdout).unwrap();
+    assert_eq!(report["clean"], false);
+    assert_eq!(report["summary"]["date_issues"], 1);
+    assert!(report["findings"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .any(|finding| {
+            finding["code"] == "invalid_date_tag" && finding["path"] == "dated.wav"
+        }));
 }

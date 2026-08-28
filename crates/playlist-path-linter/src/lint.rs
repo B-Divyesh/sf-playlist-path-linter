@@ -531,11 +531,10 @@ fn valid_date(value: &str, max_year: u32) -> bool {
     if day == 0 || day > days[usize::from(month - 1)] {
         return false;
     }
+    // The public contract deliberately accepts date-only values. Do not accept
+    // a timestamp prefix without parsing its entire timestamp: silently
+    // allowing trailing text would let malformed tags pass into an importer.
     text.len() == 10
-        || text
-            .as_bytes()
-            .get(10)
-            .is_some_and(|separator| *separator == b'T' || *separator == b' ')
 }
 
 fn current_year() -> u32 {
@@ -612,6 +611,8 @@ mod tests {
         assert!(valid_date("1999", 2027));
         assert!(!valid_date("0000", 2027));
         assert!(!valid_date("2023-02-29", 2027));
+        assert!(!valid_date("2024-01-01Tbogus", 2027));
+        assert!(!valid_date("2024-01-01 trailing text", 2027));
         assert!(!valid_date("twenty", 2027));
     }
 
