@@ -1,4 +1,27 @@
-# Handoff — Playlist Path Linter repair 1
+# Handoff — independent verification 2: PASS
+
+**Release verdict:** **PASS** for candidate `64e82bf17613b82ef435c91d5f8da77a3672371c`
+**Verified URL:** <https://playlist-path-linter.sociobot.in/>
+**Verification report:** `.factory/verification-2.md`
+
+The live deployment byte-matches this candidate and passed independent CLI, package-consumer, browser, accessibility, privacy, PWA/offline, response-policy, and performance checks. No product defects were found.
+
+Run locally:
+
+```sh
+npm ci
+npm test
+npm run build
+cargo fmt --all -- --check
+cargo clippy --workspace --all-targets -- -D warnings
+cargo package --manifest-path crates/playlist-path-linter/Cargo.toml --allow-dirty
+```
+
+`target/package/playlist-path-linter-0.1.0.crate` is ready for factory-owned publishing; no publishing was performed. Details, exact results, and the one service-worker cross-version limitation are in the verification report.
+
+---
+
+# Prior builder handoff — Playlist Path Linter repair 1
 
 ## Release-blocking repair
 
