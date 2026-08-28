@@ -60,8 +60,9 @@ cargo package --manifest-path crates/playlist-path-linter/Cargo.toml --allow-dir
   Best Practices 100, SEO 100; FCP 0.9 s, LCP 1.6 s, TBT 0 ms, CLS 0.
 - Initial assets remain within budget: JavaScript 5,755 B, CSS 10,279 B, and
   project-owned hero WebP 83,652 B; no webfonts or third-party runtime assets.
-- Live pre-deployment identity check confirmed `index.html` SHA-256 matches
-  `dist/site/`; live HTTPS headers include HSTS, CSP `default-src 'self'`,
+- Post-deployment live identity check confirmed SHA-256 byte matches for
+  `index.html`, JavaScript, CSS, service worker, manifest, privacy, and terms
+  responses against `dist/site/`; live HTTPS headers include HSTS, CSP `default-src 'self'`,
   `Referrer-Policy: no-referrer`, `X-Content-Type-Options: nosniff`, and the
   restrictive camera/microphone/geolocation Permissions Policy. Source and
   browser checks found no telemetry, storage, uploads, or runtime outbound
@@ -81,8 +82,11 @@ cargo package --manifest-path crates/playlist-path-linter/Cargo.toml --allow-dir
 ```
 
 Registry publishing was not performed; factory credentials own that action.
-The repair is deployed with the factory static deployment configuration after
-the repair commit is pushed.
+Commit `217682747a4807fb98eb66ab4c8921587e056940` was pushed to `main` and
+`/opt/fleet/lib/deploy-static.sh playlist-path-linter dist/site` completed
+successfully (Azure deployment `55c180d3-873c-4b05-a1ef-676e3e7f99e5`).
+`https://playlist-path-linter.sociobot.in/` returned HTTPS 200 after deployment
+and its latest modified time was `2026-08-28 00:54:09 UTC`.
 
 ## Known gaps
 
