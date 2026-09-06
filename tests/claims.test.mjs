@@ -405,3 +405,12 @@ test("@claim:free-mit works without an account and is MIT licensed", async () =>
     assert.ok(requests.every((url) => new URL(url).origin === origin));
   });
 });
+
+test("static site serves a designed 404 response for an unknown address", async () => {
+  await withPage(async (page) => {
+    const response = await page.goto(`${origin}/not-a-playlist-linter-route`, { waitUntil: "networkidle" });
+    assert.equal(response.status(), 404);
+    await page.getByRole("heading", { level: 1, name: "This page was not found" }).waitFor();
+    assert.equal(await page.title(), "Page not found — Playlist Path Linter");
+  });
+});
