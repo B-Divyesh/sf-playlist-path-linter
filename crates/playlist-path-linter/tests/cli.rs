@@ -199,3 +199,26 @@ fn cli_reports_malformed_riff_timestamp_in_json() {
             finding["code"] == "invalid_date_tag" && finding["path"] == "dated.wav"
         }));
 }
+
+#[test]
+fn bundled_demo_reports_known_faults_and_keeps_its_source() {
+    let output = Command::new(env!("CARGO_BIN_EXE_playlist-path-linter"))
+        .arg("demo")
+        .output()
+        .unwrap();
+
+    assert_eq!(output.status.code(), Some(1));
+    let stdout = String::from_utf8(output.stdout).unwrap();
+    assert!(stdout.contains("[unicode_normalization]"));
+    assert!(stdout.contains("[case_mismatch]"));
+    assert!(stdout.contains("[missing_path]"));
+    let location = stdout
+        .lines()
+        .find_map(|line| line.strip_prefix("Demo files kept at: "))
+        .expect("demo should name its retained workspace");
+    let workspace = std::path::PathBuf::from(location);
+    assert!(workspace.join("sample.fixed.m3u8").is_file());
+    let source = fs::read_to_string(workspace.join("sample.m3u8")).unwrap();
+    assert!(source.contains("Beyonce\u{301}"));
+    fs::remove_dir_all(workspace).unwrap();
+}

@@ -32,6 +32,8 @@ enum Command {
         #[arg(long)]
         no_date_check: bool,
     },
+    /// Run a bundled sample in a new temporary workspace
+    Demo,
 }
 
 #[derive(Clone, Copy, ValueEnum)]
@@ -86,6 +88,57 @@ fn main() -> ExitCode {
                     ExitCode::from(2)
                 }
             }
+        }
+        Command::Demo => run_demo(),
+    }
+}
+
+fn run_demo() -> ExitCode {
+    let workspace = match tempfile::Builder::new()
+        .prefix("playlist-path-linter-demo-")
+        .tempdir()
+    {
+        Ok(directory) => directory,
+        Err(error) => {
+            eprintln!("playlist-path-linter: could not create demo workspace: {error}");
+            return ExitCode::from(2);
+        }
+    };
+    let root = workspace.path().join("library");
+    let playlist = workspace.path().join("sample.m3u8");
+    let fixed = workspace.path().join("sample.fixed.m3u8");
+    let result = (|| -> Result<playlist_path_linter::Report, std::io::Error> {
+        std::fs::create_dir_all(root.join("Beyoncé/I Am... Sasha Fierce"))?;
+        std::fs::create_dir_all(root.join("Talk Talk/Spirit of Eden"))?;
+        std::fs::write(root.join("Beyoncé/I Am... Sasha Fierce/Halo.flac"), [])?;
+        std::fs::write(root.join("Talk Talk/Spirit of Eden/Desire.mp3"), [])?;
+        std::fs::write(&playlist, include_str!("../examples/demo-playlist.m3u8"))?;
+        lint_playlist(&LintOptions {
+            playlist,
+            library_root: root,
+            fixed_output: Some(fixed),
+            case_mode: CaseMode::Sensitive,
+            check_dates: true,
+        })
+        .map_err(|error| std::io::Error::other(error.to_string()))
+    })();
+
+    match result {
+        Ok(report) => {
+            println!("Bundled demo ran in: {}", workspace.path().display());
+            println!("The source playlist in this workspace is unchanged.");
+            print_human(&report);
+            let path = workspace.keep();
+            println!("Demo files kept at: {}", path.display());
+            if report.clean {
+                ExitCode::SUCCESS
+            } else {
+                ExitCode::from(1)
+            }
+        }
+        Err(error) => {
+            eprintln!("playlist-path-linter: demo could not run: {error}");
+            ExitCode::from(2)
         }
     }
 }

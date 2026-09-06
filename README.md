@@ -1,85 +1,98 @@
 # Playlist Path Linter
 
-Playlist Path Linter checks an M3U/M3U8 before a music server or tagger silently drops tracks. It resolves relative and absolute entries against a local library, detects Unicode normalization and case mismatches, reports ambiguous or missing files, inspects resolved audio tags for suspicious dates, and can write a corrected playlist plus a JSON report.
+Check playlist paths before import. It is for musicians and local-library listeners moving M3U playlists between taggers, servers, and devices.
 
-It is for musicians, DJs, archivists, and serious local-library listeners moving playlists between taggers, servers, NASes, and devices. Everything runs locally: no telemetry, metadata lookup, or network access.
+The CLI reads M3U and M3U8 playlists. It resolves relative and absolute entries under a library root. It handles mixed slash separators. It diagnoses NFC/NFD and case-only path differences. It reports missing and ambiguous paths without guessing. It rejects parent traversal outside the root. It reports remote URLs without fetching them.
 
-Live docs and browser specimen: <https://playlist-path-linter.sociobot.in>
+Resolved audio files are checked for year zero, malformed dates, and implausible future dates. Comments and EXTINF records stay in corrected playlists. Safe corrections preserve the source playlist, UTF-8 BOM, and line endings. JSON reports are versioned and include line-level findings.
+
+Everything runs locally. The CLI does not contact music or metadata hosts. The browser worksheet makes no uploads or third-party requests. The normal worksheet clears after refresh. The folder picker reads selected file names without reading audio contents.
+
+Live site: <https://playlist-path-linter.sociobot.in/>. One-click browser demo: <https://playlist-path-linter.sociobot.in/demo/>.
+
+## Try the sample
+
+Run the bundled sample without setting up a music library:
+
+```sh
+playlist-path-linter demo
+```
+
+The command creates a temporary workspace. It reports Unicode, case, and missing-path problems. It prints where the source and corrected copy were kept. The command exits `1` because the sample has findings. The input also ships at `examples/demo-playlist.m3u8`.
+
+The browser demo opens the same three known problems in one click. It uses `demo:playlist-path-linter:*` browser storage only. Reset demo restores the sample. Start for real discards the demo storage.
 
 ## Install
 
-Download a release binary, or build with Rust 1.85+:
+Use Rust 1.85 or later:
 
 ```sh
 cargo install --path crates/playlist-path-linter
 ```
 
-## Usage
+## Use the CLI
 
-Lint a playlist against a library root:
+Check a playlist against a library root:
 
 ```sh
 playlist-path-linter lint road-trip.m3u8 --root /music
 ```
 
-Write a corrected copy without changing the source. The output retains the input BOM/encoding and line endings:
+Write a corrected copy without changing the source:
 
 ```sh
 playlist-path-linter lint road-trip.m3u8 --root /music --fix road-trip.fixed.m3u8
 ```
 
-Produce a machine-readable report:
+Write a JSON report for scripts:
 
 ```sh
 playlist-path-linter lint road-trip.m3u8 --root /music --json > report.json
 ```
 
-Use `--case sensitive` or `--case insensitive` to model the destination filesystem. `auto` is the default and follows the current platform. Run `playlist-path-linter --help` or `playlist-path-linter lint --help` for all options.
+Use `--case sensitive`, `--case insensitive`, or `--case auto`. `auto` follows the current platform. The report states the selected case model.
 
-Exit codes:
-
-| Code | Meaning |
+| Exit code | Result |
 | --- | --- |
-| `0` | Playlist is clean |
-| `1` | One or more findings were reported |
-| `2` | Usage, encoding, filesystem, or write error |
+| `0` | Every playlist entry resolved cleanly. |
+| `1` | The report contains one or more findings. |
+| `2` | The command could not run because of usage, encoding, filesystem, or write errors. |
 
-The JSON schema is versioned by `schema_version`. Each finding includes the playlist line, stable code, severity, original path, candidates when relevant, and a precise explanation.
+The tool is read-only by default. It does not change a source playlist or media file. The browser worksheet checks path text only. The CLI checks date tags in resolved audio files.
 
-## What it checks
+## Develop, test, and build
 
-- Missing paths, including mixed `/` and `\\` separators.
-- NFC/NFD Unicode mismatches and case-only mismatches.
-- Ambiguous normalized paths (never guessed or auto-corrected).
-- Relative traversal outside the selected library root.
-- Remote URLs, reported as skipped rather than fetched.
-- Resolved media tags containing `0000`, malformed dates, or years outside `1000..=current year + 1`.
-
-Comments and `#EXTINF` records are retained. By default the CLI is read-only. A fixed copy changes only unambiguous path lines.
-
-## Develop, test, and deploy
-
-Requirements: Rust 1.85+, Node 20+, and npm 10+.
+Requirements: Rust 1.85 or later, Node 20 or later, and npm 10 or later.
 
 ```sh
-npm install
+npm ci
 npm test
 npm run build
 ```
 
-`npm test` runs Rust unit/integration tests and browser-demo tests. `npm run build` creates the CLI release binary and the deployable static site at `dist/site/` (with `index.html` at that root). Run the site locally with `npm run dev`.
+The documented setup builds the release binary and the static site. The site output is `dist/site/`. The release binary is `target/release/playlist-path-linter`.
 
-Ready-to-publish check:
+Run the site locally:
+
+```sh
+npm run dev
+```
+
+Create the factory-ready crate without publishing it:
 
 ```sh
 cargo package --manifest-path crates/playlist-path-linter/Cargo.toml --allow-dirty
 ```
 
-The factory owns registry credentials; this repository does not publish or deploy itself.
+The factory owns registry credentials. This repository does not publish or deploy itself.
 
-## Scope and privacy
+## Privacy and license
 
-Playlist Path Linter does not download audio, query metadata services, modify tags, run a media server, or alter a source playlist. The website’s specimen runs entirely in the browser and stores nothing.
+No account is needed. The tool is free and MIT licensed. There are no cookies, ads, analytics, or third-party scripts. Read the [privacy policy](https://playlist-path-linter.sociobot.in/privacy/) and [terms](https://playlist-path-linter.sociobot.in/terms/).
+
+## Scope
+
+Playlist Path Linter does not download audio. It does not query metadata services. It does not edit tags.
 
 ## License
 

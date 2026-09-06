@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#f4f0e6">
+    <meta name="description" content="Run a sample M3U path check with three known problems in an isolated demo.">
+    <link rel="canonical" href="https://playlist-path-linter.sociobot.in/demo/">
+    <meta property="og:type" content="website"><meta property="og:title" content="Demo — Playlist Path Linter"><meta property="og:description" content="Run a sample M3U path check with three known problems in an isolated demo."><meta property="og:url" content="https://playlist-path-linter.sociobot.in/demo/"><meta property="og:image" content="https://playlist-path-linter.sociobot.in/social-card.jpg">
+    <meta name="twitter:card" content="summary_large_image"><meta name="twitter:title" content="Demo — Playlist Path Linter"><meta name="twitter:description" content="Run a sample M3U path check with three known problems in an isolated demo."><meta name="twitter:image" content="https://playlist-path-linter.sociobot.in/social-card.jpg">
+    <title>Demo — Playlist Path Linter</title><link rel="icon" href="/favicon.svg" type="image/svg+xml"><link rel="apple-touch-icon" href="/apple-touch-icon.png"><link rel="manifest" href="/manifest.webmanifest">
+  </head>
+  <body data-demo="true">
+    <a class="skip-link" href="#main">Skip to main content</a><p class="offline" id="offline" hidden><span aria-hidden="true">○</span> Offline mode — the worksheet still runs locally.</p>
+    <header class="site-header"><a class="wordmark" href="/" aria-label="Playlist Path Linter home"><span aria-hidden="true">⌁</span> PPL / 01</a><nav aria-label="Primary navigation"><a href="/demo/" aria-current="page">Demo</a><a href="/#worksheet">Worksheet</a><a href="/#install">Install</a><a href="/privacy/">Privacy</a></nav></header>
+    <aside class="demo-banner" id="demo-banner" aria-label="Demo controls"><p><strong>Demo</strong> — sample data, nothing is saved to your real worksheet.</p><div><button type="button" class="button button--secondary" id="reset-demo">Reset demo</button><button type="button" class="button button--primary" id="start-real">Start for real</button></div></aside>
+    <main id="main">
+      <section class="demo-intro" aria-labelledby="demo-title"><p class="eyebrow">One-click sample</p><h1 id="demo-title">Check sample playlist paths</h1><p>Three realistic problems are already shown below. Reset restores this isolated sample.</p></section>
+      <section class="worksheet-section demo-worksheet" aria-labelledby="worksheet-title">
+        <div class="section-intro"><p class="eyebrow">Sample worksheet</p><h2 id="worksheet-title">Inspect the sample report</h2><p>The sample includes one Unicode mismatch, one case mismatch, and one missing file.</p></div>
+        <form id="specimen-form" class="worksheet"><div class="field-grid"><div class="field"><div class="field-heading"><label for="playlist">Playlist text</label><span>M3U / M3U8</span></div><textarea id="playlist" name="playlist" rows="10" spellcheck="false" aria-describedby="playlist-help"></textarea><p class="field-help" id="playlist-help">Change this sample, or <label class="inline-file" for="playlist-file">choose a playlist<input id="playlist-file" type="file" accept=".m3u,.m3u8,audio/x-mpegurl"></label>.</p></div><div class="field"><div class="field-heading"><label for="library">Known library paths</label><span>ONE PER LINE</span></div><textarea id="library" name="library" rows="10" spellcheck="false" aria-describedby="library-help"></textarea><p class="field-help" id="library-help">Change these paths, or <label class="inline-file" for="library-files">choose a library folder<input id="library-files" type="file" webkitdirectory multiple></label>.</p></div></div><div class="tool-row"><label for="case-mode">Destination case</label><select id="case-mode" name="case-mode"><option value="sensitive">Sensitive (Linux)</option><option value="insensitive">Insensitive (macOS / Windows)</option></select><div class="tool-actions"><button class="button button--secondary" type="button" id="sample">Load the sample</button><button class="button button--primary" type="submit">Run inspection</button></div></div></form>
+        <div class="result-head"><div><p class="eyebrow">Inspection report</p><p id="status" role="status" aria-live="polite">Loading sample paths.</p></div><button class="button button--secondary" type="button" id="download" disabled>Download corrected copy</button></div><div class="results" id="results"><div class="empty-result"><span aria-hidden="true">⌖</span><div><strong>Loading the sample</strong><p>The sample report will appear here.</p></div></div></div>
+      </section>
+    </main>
+    <footer><p>Playlist Path Linter <span>•</span> checks playlist paths before import</p><nav aria-label="Footer navigation"><a href="/">Home</a><a href="/privacy/">Privacy</a><a href="/terms/">Terms</a><a href="https://github.com/B-Divyesh/sf-playlist-path-linter" target="_blank" rel="noreferrer">Source (opens GitHub)</a></nav><p>Built by Param Factory · v0.1.0</p></footer><script type="module" src="/src/main.ts"></script>
+  </body>
+</html>
