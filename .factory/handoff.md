@@ -1,42 +1,35 @@
-# Handoff — repair 2
+# Handoff — review 2
 
-## Independent verification 3
+## Verdict
 
-**Verdict: PASS** — completed against implementation `1605c2c70dc7de2501155c36d339e66b9a452e5e`; documentation handoff commit `ac04e36b4e7588a8b245b0d78b25f2f3f796a7a7`.
+**PASS** for implementation `1605c2c70dc7de2501155c36d339e66b9a452e5e` with documentation/report HEAD `a8e7b84ac690dd63db93f2f87b2b51fc55de6e21`.
 
-- Zero findings and zero untested claims.
-- Fresh `npm ci`, tests, release/site build, fmt, Clippy, typecheck, package, live browser audit, and all 24 individually-declared claim commands passed.
-- A clean consumer installed the packed crate and exercised the installed `playlist-path-linter demo` command successfully.
-- Fresh live desktop and phone contexts confirmed the first-screen job/audience/action, one-click three-finding demo, demo storage isolation/reset/exit, normal/invalid/recovery paths, keyboard/focus/reduced-motion behavior, Axe, offline reload, privacy, legal routes, working links, and intentional HTTP 404.
-- The checked deployment pages, worker, metadata, and assets byte-match the candidate build. Full evidence: `.factory/verification-3.md`.
+- Findings: **0**
+- Untested public claims: **0**
+- Live URL: <https://playlist-path-linter.sociobot.in/>
+- Full report: `.factory/review-2.md`
 
-No known product gaps remain within the researched v1 scope. The browser worksheet intentionally checks path text only; native audio date-tag inspection remains a CLI function because the browser never reads audio contents.
+The commits after the implementation candidate change factory reports only. The live static resources byte-match `1605c2c`.
 
-## Release
+## What this review verified
 
-- **Implementation SHA:** `1605c2c70dc7de2501155c36d339e66b9a452e5e`
-- **Implementation commits:** `b34044d` adds the isolated demos, claims suite, copy, metadata, and site structure; `1605c2c` corrects live 404 handling.
-- **Live URL:** <https://playlist-path-linter.sociobot.in/>
-- **Static deployment:** `2787a074-a9ec-4748-86ac-3601366cd750`, followed by the 404 configuration deployment for `1605c2c`.
-- **Billing:** not applicable. The researched brief specifies a free MIT utility; no paid offer or billing metadata is required.
+- Fresh desktop and phone first screens state the job, audience, first action, and sample outcome before scrolling.
+- The one-click browser sample immediately shows Unicode, case, and missing-path findings.
+- The demo label stays visible. Reset restores the sample. Start for real clears demo storage and leaves normal fields blank.
+- Normal, empty, traversal, missing, remote, and recovery browser paths behave correctly.
+- All 24 declared claim commands pass individually from a clean checkout. Each claim has exactly one tagged test.
+- `npm test`, build, fmt, Clippy, typecheck, package, and the live browser audit pass.
+- A fresh consumer installs the packed crate and runs its bundled demo with the documented exit code and unchanged source.
+- Keyboard, focus, touch targets, Axe, reduced motion, offline reload, privacy requests, legal routes, links, titles, and designed HTTP 404 pass.
+- Thirteen live resources byte-match the built candidate.
+- Lighthouse mobile scores 100 in Performance, Accessibility, Best Practices, and SEO.
 
-## What changed
+Evidence is under `/work/.evidence/review-2/`. The required copies are `/work/.evidence/qa-report.md` and `/work/.evidence/qa-result.json`.
 
-- Added the required one-click demo at `/demo/`. It opens three realistic findings immediately, keeps a persistent demo label, supports **Reset demo** and **Start for real**, and uses only `demo:playlist-path-linter:worksheet` storage.
-- Added `playlist-path-linter demo`. It creates a unique temporary sample library, reports Unicode, case, and missing-path defects, writes a corrected copy, prints the workspace path, and leaves user files untouched. The packed crate contains its bundled sample.
-- Added shipped sample inputs under `examples/` and `crates/playlist-path-linter/examples/`, plus `.factory/demo.md`.
-- Added `.factory/claims.json` with 24 public claims. Each has exactly one tagged, outcome-based CLI or browser test in `tests/claims.test.mjs`.
-- Rewrote the landing and README in plain words. The first screen now states the job, audience, and first action. `.factory/copy-audit.md` records sentence counts and terminology.
-- Added `/demo/`, `/privacy/`, `/terms/`, and designed `/404.html` structure; per-route titles and metadata; canonical, Open Graph, Twitter, social image, manifest icons, sitemap, complete navigation/footer, and live HTTP 404 behavior.
-- Corrected all mobile controls to at least 44 × 44 CSS px. Added focusability to the horizontally scrollable CLI output.
-- Added product-owned social and app-icon assets. Their provenance is recorded in `.factory/design.md`.
-- Added `.factory/catalog-description.txt` and copied its exact verb-first description to `/work/.evidence/catalog-description.txt`.
-
-## Verification
-
-From a clean `npm ci` install:
+## Run the checks
 
 ```sh
+npm ci
 npm test
 npm run build
 cargo fmt --all -- --check
@@ -44,39 +37,13 @@ cargo clippy --workspace --all-targets -- -D warnings
 npx tsc --noEmit --target ES2022 --module ESNext --moduleResolution bundler \
   --lib ES2022,DOM,DOM.Iterable --allowJs site/src/main.ts
 cargo package --manifest-path crates/playlist-path-linter/Cargo.toml --allow-dirty
-npm run audit:browser -- http://127.0.0.1:4173/
+npm run audit:browser -- https://playlist-path-linter.sociobot.in/
 ```
 
-All commands pass. `npm test` runs 7 Rust unit tests, 7 Rust CLI integration tests, 3 browser-core tests, 24 tagged claim tests, and one static 404 regression test. Every command in `.factory/claims.json` was also run individually and passed.
-
-The packaged crate was unpacked into a clean temporary consumer, installed with `cargo install --path`, and verified with `--help` and `demo`. The installed binary reported all three known sample defects and named its retained workspace.
-
-Local and live browser checks passed on 1440 × 960 and 390 × 844:
-
-- first-screen action visible before scrolling;
-- one-click sample has three findings, persistent demo label, reset, and safe exit;
-- keyboard flow, focus rings, no horizontal overflow, and all visible interactive targets at least 44 × 44 px;
-- `verify-url.sh` passed title, `lang`, landmark, image-alt, button, and console checks;
-- Playwright Axe WCAG A/AA integration found zero violations locally and live;
-- normal worksheet reload clears its fields; demo storage is separate; request capture found only same-origin requests;
-- after service-worker control, a fresh live offline reload retained the demo title, H1, and three findings;
-- `/definitely-not-a-real-route` now returns HTTP 404 with `Page not found — Playlist Path Linter`;
-- root, demo, privacy, terms, 404, worker, manifest, images, and hashed assets byte-match the deployed build.
-
-Lighthouse mobile production-preview result: Performance **100**, Accessibility **100**, Best Practices **100**, SEO **100**; FCP 0.95 s, LCP 1.65 s, TBT 0 ms, CLS 0. The standalone Axe CLI could not start its bundled Chrome in this container; the repository’s Playwright Axe integration passed with the installed Chromium instead.
-
-## Earlier findings
-
-| Earlier finding | Current disposition |
-| --- | --- |
-| Malformed date suffix accepted | Fixed earlier and retained: malformed RIFF date integration coverage passes. |
-| Browser audit failed without evidence directory | Fixed earlier and retained: the audit creates the directory. |
-| Missing isolated browser and CLI demo | Fixed with `/demo/`, `playlist-path-linter demo`, shipped fixtures, reset, and isolation checks. |
-| Missing claims registry and tests | Fixed with 24 declared public claims and individually-run tagged checks. |
-| Non-literal first-screen copy and no copy audit | Fixed with literal headings, named audience/action, and `.factory/copy-audit.md`. |
-| Missing route metadata, nav/footer, icons, and 404 | Fixed. A live fallback issue found during this repair was corrected in `1605c2c`; unknown paths now return HTTP 404. |
-| Mobile controls below 44 px | Fixed and measured at 390 px. |
+For strict claim verification, run every `test` command in `.factory/claims.json` separately.
 
 ## Known scope boundary
 
-The browser worksheet inspects playlist path text only. Native media date-tag inspection remains in the CLI, where the local audio files are available. This is intentional and documented; the browser never uploads or reads audio contents.
+The browser worksheet checks playlist path text and selected file names. Native media date-tag inspection stays in the local CLI because the browser does not read audio contents. This boundary is documented and tested.
+
+No product gap remains within the researched v1 scope. No product code changed during review 2.
