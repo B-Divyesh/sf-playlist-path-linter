@@ -1,4 +1,30 @@
-# Handoff — independent verification 2: PASS
+# Handoff — review 1: FAIL
+
+- Review verdict: **FAIL**
+- Finding count: 5 (2 high, 2 medium, 1 low)
+- Untested claim count: 24
+- Implementation reviewed: `217682747a4807fb98eb66ab4c8921587e056940`
+- Documentation HEAD before this report: `e46f1cb68a28216f2a52cc95c5ef001f960eb178`
+- Live URL: <https://playlist-path-linter.sociobot.in/>
+- Full report: `.factory/review-1.md`
+
+No product code was changed. The review found that the core CLI, browser worksheet, build, package, accessibility scan, privacy behavior, offline reload, and performance remain healthy. The release still fails the current strict contract because:
+
+- the web sample and installed CLI do not provide the required isolated, one-click demo;
+- `.factory/claims.json` is absent, leaving 24 public claim families without declared tagged tests;
+- the first screen omits the audience and uses non-literal headings;
+- the required 404, route metadata, navigation/footer details, and manifest icons are incomplete;
+- three mobile touch targets are shorter than 44 px.
+
+Verification completed from the clean checkout with `npm ci`, `npm test`, `npm run build`, Rust format and Clippy checks, TypeScript checking, `cargo package`, an install of the packed crate into a fresh Cargo root, live browser flows at desktop and phone sizes, Axe, the worker URL verifier, offline reload, privacy request capture, link checks, live/build hash comparison, and Lighthouse mobile. See `.factory/review-1.md` for results and evidence paths.
+
+The earlier malformed-date defect and browser-audit-directory defect remain fixed. Eight live resources byte-match the current build, which differs from the implementation candidate only by later report commits.
+
+Required next work is to implement the missing demo and claim contracts, repair first-screen and site structure requirements, fix the small touch targets, and then run a new strict review. PASS requires zero findings and zero untested claims.
+
+---
+
+# Previous handoff — independent verification 2: PASS
 
 **Release verdict:** **PASS** for candidate `64e82bf17613b82ef435c91d5f8da77a3672371c`
 **Verified URL:** <https://playlist-path-linter.sociobot.in/>
